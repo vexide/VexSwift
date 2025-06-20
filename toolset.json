@@ -7,7 +7,7 @@
       "-Xfrontend", "-function-sections",
       "-Xfrontend", "-mergeable-symbols",
       "-Xfrontend", "-disable-stack-protector",
-      "-Xclang-linker", "-nostdlib"
+      "-Xclang-linker", "-nostdlib", "-use-ld=lld"
     ]
   },
   "cCompiler": {
