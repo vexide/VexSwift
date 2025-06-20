@@ -22,8 +22,18 @@ void swift_startup(void) {
     main();
 }
 
-// stub to fix linker errors
 int putchar(int value) {
-    // TODO
-    return 0;
+    static const uint32_t STDIO_CHANNEL = 1; 
+
+    void (*vexTasksRun)(void) = *(void (**)(void))0x037fc05c;
+    int32_t (*vexSerialWriteChar)(uint32_t, uint8_t) = *(int32_t (**)(uint32_t, uint8_t))0x037fc898;
+    int32_t (*vexSerialWriteFree)(uint32_t) = *(int32_t (**)(uint32_t))0x037fc8ac;
+
+    int rtn = vexSerialWriteChar(STDIO_CHANNEL, value);
+    
+    while (vexSerialWriteFree(STDIO_CHANNEL) < 2048) {
+        vexTasksRun();
+    }
+
+    return rtn == 1 ? value : -1;
 }
