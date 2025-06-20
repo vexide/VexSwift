@@ -16,6 +16,7 @@ extern uint8_t __bss_end[];
 // The entrypoint for the program.
 // Handles setting up the stack pointer.
 [[gnu::naked]]
+[[gnu::section(".boot")]]
 [[noreturn]]
 void boot(void) asm("_boot");
 
