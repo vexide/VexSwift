@@ -21,3 +21,9 @@ swift build -c release --triple armv7-none-none-eabi --toolset toolset.json
 ```
 
 The ELF output is located at: `./.build/release/VexSwiftApp`.
+
+## Big one-liner that does all the things™
+
+```shell
+swift build -c release --triple armv7-none-none-eabi --toolset toolset.json && arm-none-eabi-objcopy -O binary ./.build/release/VexSwiftApp ./.build/release/VexSwiftApp.bin && cargo v5 run --file=./.build/release/VexSwiftApp.bin --slot=1
+```
