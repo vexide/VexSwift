@@ -19,7 +19,8 @@
       "-Wall",
       "-static",
       "-fno-stack-protector",
-      "-fno-common"
+      "-fno-common",
+      "-std=gnu23"
     ]
   },
   "linker": {

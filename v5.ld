@@ -38,6 +38,8 @@ SECTIONS {
     /* Global/uninitialized/static/constant data sections. */
     .rodata : {
         *(.rodata .rodata.*)
+        /* Global Offset Table, used for resolving globals */
+        *(.got*)
     } > USER_RAM
 
     .data : {
