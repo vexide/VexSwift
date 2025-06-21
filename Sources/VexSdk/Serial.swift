@@ -38,8 +38,8 @@ public func vexSerialWriteFree(channel: UInt32) -> Int32 {
 }
 
 @inline(__always)
-@_cdecl("vexTasksRun")
-public func vexTasksRun() {
+@_cdecl("vexBatteryCapacityGet")
+public func vexBatteryCapacityGet() {
     typealias RawFunc = @convention(c) () -> Void
 
     let rawFunc = UnsafeRawPointer(bitPattern: jumpTableStart)!
@@ -47,14 +47,3 @@ public func vexTasksRun() {
 
     return rawFunc()
 }
-
-// @inline(__always)
-// @_cdecl("vexBatteryCapacityGet")
-// public func vexBatteryCapacityGet() {
-//     typealias RawFunc = @convention(c) () -> Void
-
-//     let rawFunc = UnsafeRawPointer(bitPattern: jumpTableStart)!
-//         .load(fromByteOffset: 0x05c, as: RawFunc.self)
-
-//     return rawFunc()
-// }

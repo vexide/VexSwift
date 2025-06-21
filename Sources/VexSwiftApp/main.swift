@@ -11,22 +11,32 @@ struct VexSwiftApp {
         // https://docs.swift.org/embedded/documentation/embedded/externaldependencies
 
         // 1. using print() - putchar
-
         print("Hello, world!")
 
-        // _ = vexSerialWriteChar(channel: 1, "H".utf8.first!)
-        // _ = vexSerialWriteChar(channel: 1, "E".utf8.first!)
-        // _ = vexSerialWriteChar(channel: 1, "L".utf8.first!)
-        // _ = vexSerialWriteChar(channel: 1, "L".utf8.first!)
-        // _ = vexSerialWriteChar(channel: 1, "O".utf8.first!)
-        // _ = vexSerialWriteChar(channel: 1, "\n".utf8.first!)
-
         // 2. instantiating a class, or using UnsafeMutablePointer.allocate() - posix_memalign, free
+        let myClass = TestClass(value: "Hello from a class")
+        myClass.printValue()
+
+        print("My number is \(40)")
 
         // 3. Hashable, Set, Dictionary, or random-number generating APIs - arc4random_buf
+        var generator = SystemRandomNumberGenerator()
+        print("Random number: \(generator.next())")
 
         while true {
             vexTasksRun()
         }
+    }
+}
+
+class TestClass {
+    var value: String
+
+    init(value: String) {
+        self.value = value
+    }
+
+    func printValue() {
+        print(value)
     }
 }

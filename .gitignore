@@ -1,4 +1,7 @@
 llvm-toolchain
+*.bin
+
+.vscode/launch.json
 
 .DS_Store
 /.build

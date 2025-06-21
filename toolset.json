@@ -2,12 +2,13 @@
   "schemaVersion": "1.0",
   "swiftCompiler": {
     "extraCLIOptions": [
-      "-Xfrontend", "-disable-stack-protector",
       "-enable-experimental-feature", "Embedded",
+      "-Xfrontend", "-disable-stack-protector",
       "-Xfrontend", "-function-sections",
       "-Xfrontend", "-mergeable-symbols",
-      "-Xfrontend", "-disable-stack-protector",
       "-Xclang-linker", "-nostdlib",
+      "-target-cpu", "cortex-a9",
+      "-sysroot", "llvm-toolchain/lib/clang-runtimes/arm-none-eabi/armv7a_hard_vfpv3_d16",
       "-use-ld=lld"
     ]
   },
@@ -21,11 +22,13 @@
       "-static",
       "-fno-stack-protector",
       "-fno-common",
-      "-std=gnu23"
+      "-std=gnu23",
+      "-ftls-model=local-exec"
     ]
   },
   "linker": {
     "extraCLIOptions": [
+      "-t", "-v",
       "-T", "v5.ld",
       "-Lllvm-toolchain/lib/clang-runtimes/arm-none-eabi/armv7a_hard_vfpv3_d16/lib",
       "-lc",

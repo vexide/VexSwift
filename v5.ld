@@ -3,12 +3,12 @@ OUTPUT_FORMAT("elf32-littlearm")
 ENTRY(_boot)
 
 __user_ram_start = 0x03800000;
-__user_ram_length = 0x04800000;
-__user_ram_end = __user_ram_start + __user_ram_length;
+__user_ram_length = 48M;
+__user_ram_end = __user_ram_start + __user_ram_length; /* 0x08000000 */
 
 __code_signature_length = 0x20;
 
-__stack_length = 0x400000;
+__stack_length = 4M;
 __heap_end = __user_ram_end - __stack_length;
 
 /* see https://github.com/llvm/llvm-project/blob/main/libunwind/src/AddressSpace.hpp#L78 */
@@ -42,16 +42,6 @@ SECTIONS {
         *(.got*)
     } > USER_RAM
 
-    .data : {
-        *(.data .data.*)
-    } > USER_RAM
-
-    .bss : {
-        __bss_start = .;
-        *(.bss .bss.*)
-        __bss_end = .;
-    } > USER_RAM
-
     /*
      * These sections are added by the compiler in some cases to facilitate stack unwinding.
      * __eh_frame_start and similar symbols are used by libunwind.
@@ -78,19 +68,56 @@ SECTIONS {
         __extab_end = .;
     } > USER_RAM */
 
-    /* ELF metadata sections */
-    /* It's possible Swift uses them, for now they're just here to be safe */
-    .symtab   : { *(.symtab) }
-    .strtab   : { *(.strtab) }
-    .shstrtab : { *(.shstrtab) }
-    .debug    : { *(.debug*) }
-    .comment  : { *(.comment) }
+    .data : {
+        *(.data .data.*)
+    } > USER_RAM
+
+    /*
+     * .tdata must be at least as aligned as .tbss so memcpy-ing the entire
+     * TLS block to an address with alignment `__tls_align` works as expected.
+     *
+     * See: https://github.com/picolibc/picolibc/commit/de46cd909e6cad136e4c97c45c74f47cb4b00426
+     */
+
+    .tdata : ALIGN(__tls_align) {
+        __tls_base = .;
+        __tdata_start = .;
+
+        *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+        __tdata_end = .;
+    } > USER_RAM
+
+    /* __bss_start includes .tbss because both of them need to be zeroed on startup */
+
+    .tbss (NOLOAD) : {
+        __bss_start = .;
+        __tbss_start = .;
+
+        *(.tbss .tbss.*)
+        *(.tcommon)
+
+        __tls_end = .;
+        __tbss_end = .;
+    } > USER_RAM
+
+    __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+    __arm32_tls_tcb_offset = MAX(8, __tls_align);
+
+
+    .bss (NOLOAD) : {
+        *(.bss .bss.*)
+    } > USER_RAM
+
+    __bss_end = .;
 
     /* Active memory regions for the stack/heap. */
-    .heap (NOLOAD) : ALIGN(4) {
+    .heap (NOLOAD) : ALIGN(8) {
         __heap_start = .;
         . = __heap_end;
     } > USER_RAM
+
+    __heap_length = __heap_end - __heap_start;
 
     .stack (NOLOAD) : ALIGN(8) {
         __stack_bottom = .;
@@ -118,5 +145,15 @@ SECTIONS {
     /* Unused Swift metadata */
     /DISCARD/ : {
         *(.swift_modhash*)
+        *(.swift_ast*)
     }
+
+    /* ELF metadata sections */
+    /* These are not loaded into the final BIN, but stay in the ELF to help with debugging */
+    /* All are given an offset of 0 for proper semantics */
+    .symtab   0 : { *(.symtab) }
+    .strtab   0 : { *(.strtab) }
+    .shstrtab 0 : { *(.shstrtab) }
+    .debug    0 : { *(.debug*) }
+    .comment  0 : { *(.comment) }
 }
