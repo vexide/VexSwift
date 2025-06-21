@@ -25,8 +25,3 @@ void boot(void) asm("_boot");
 // Fills the `.bss` (uninitialized statics) section with zeroes,
 // then calls the main function
 void swift_startup(void);
-
-// MARK: Stubs
-
-#undef putchar
-int putchar(int value);

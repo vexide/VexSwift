@@ -24,8 +24,10 @@ let package = Package(
         .target(
             name: "VexV5",
             dependencies: [
-                "VexV5Startup"
+                "VexV5Startup",
+                "VexSdk",
             ]),
+        .target(name: "VexSdk"),
         .target(name: "VexV5Startup"),
     ]
 )
